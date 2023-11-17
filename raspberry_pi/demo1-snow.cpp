@@ -11,13 +11,13 @@
 
 #include "Adafruit_PixelDust.h"
 #include "led-matrix-c.h"
-#include "lis3dh.h"
+#include "microbit-serial.h"
 #include <signal.h>
 
 #define N_FLAKES 900 ///< Number of snowflakes on 64x64 matrix
 
 struct RGBLedMatrix *matrix = NULL;
-Adafruit_LIS3DH lis3dh;
+MicroBitSerial microbit_serial;
 volatile bool running = true;
 int nFlakes = N_FLAKES; // Runtime flake count (adapts to res)
 
@@ -74,15 +74,15 @@ int main(int argc, char **argv) {
     return 2;
   }
 
-  if (lis3dh.begin()) {
-    puts("LIS3DH init failed");
+  if (microbit_serial.init() != 1) {
+    puts("MicroBitSerial init failed");
     return 3;
   }
 
   snow->randomize(); // Initialize random snowflake positions
 
   while (running) {
-    lis3dh.accelRead(&xx, &yy, &zz);
+    microbit_serial.readAccelerometer(&xx, &yy, &zz);
     // Run one frame of the simulation.  Axis flip here
     // depends how the accelerometer is mounted relative
     // to the LED matrix.

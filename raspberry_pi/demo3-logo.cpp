@@ -16,7 +16,7 @@
 
 #include "Adafruit_PixelDust.h"
 #include "led-matrix-c.h"
-#include "lis3dh.h"
+#include "microbit-serial.h"
 #include <signal.h>
 
 #include "logo.h" // This contains the obstacle bitmaps
@@ -24,7 +24,7 @@
 #define N_GRAINS (8 * 8 * 8) ///< Number of grains of sand on 64x64 matrix
 
 struct RGBLedMatrix *matrix = NULL;
-Adafruit_LIS3DH lis3dh;
+MicroBitSerial microbit_serial;
 volatile bool running = true;
 int nGrains = N_GRAINS; // Runtime grain count (adapts to res)
 
@@ -84,8 +84,8 @@ int main(int argc, char **argv) {
   fprintf(stderr, "Size: %dx%d. Hardware gpio mapping: %s\n", width, height,
           options.hardware_mapping);
 
-  if (lis3dh.begin()) {
-    puts("LIS3DH init failed");
+  if (microbit_serial.init() != 1) {
+    puts("MicroBitSerial init failed");
     return 2;
   }
 
@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 
   while (running) {
     // Read accelerometer...
-    lis3dh.accelRead(&xx, &yy, &zz);
+    microbit_serial.readAccelerometer(&xx, &yy, &zz);
 
     // Run one frame of the simulation.  Axis flip here
     // depends how the accelerometer is mounted relative

@@ -12,13 +12,13 @@
 
 #include "Adafruit_PixelDust.h"
 #include "led-matrix-c.h"
-#include "lis3dh.h"
+#include "microbit-serial.h"
 #include <signal.h>
 
 #define N_GRAINS 800 ///< Number of sand grains on 64x64 matrix
 
 struct RGBLedMatrix *matrix;
-Adafruit_LIS3DH lis3dh;
+MicroBitSerial microbit_serial;
 volatile bool running = true;
 int nGrains = N_GRAINS; // Runtime grain count (adapts to res)
 
@@ -69,8 +69,8 @@ int main(int argc, char **argv) {
   if (height < 64)
     nGrains /= 2; // for smaller matrices
 
-  if (lis3dh.begin()) {
-    puts("LIS3DH init failed");
+  if (microbit_serial.init() != 1) {
+    puts("MicroBitSerial init failed");
     return 2;
   }
 
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
 
   while (running) {
     // Read accelerometer...
-    lis3dh.accelRead(&xx, &yy, &zz);
+    microbit_serial.readAccelerometer(&xx, &yy, &zz);
 
     // Run one frame of the simulation.  Axis flip here
     // depends how the accelerometer is mounted relative

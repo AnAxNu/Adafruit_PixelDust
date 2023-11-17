@@ -12,7 +12,7 @@
 #include <signal.h>
 #include <led-matrix.h>
 #include "Adafruit_PixelDust.h"
-#include "lis3dh.h"
+#include "microbit-serial.h"
 #include "logo.h" // This contains the obstacle bitmaps
 
 using namespace rgb_matrix;
@@ -31,7 +31,7 @@ uint8_t colors[][3] = { // Sand grain colors...
 
 RGBMatrix *matrix;
 FrameCanvas *canvas;
-Adafruit_LIS3DH lis3dh;
+MicroBitSerial microbit_serial;
 volatile bool running = true;
 
 Plane plane[] = {
@@ -93,8 +93,8 @@ int main(int argc, char **argv) {
     return 2;
   }
 
-  if (lis3dh.begin()) {
-    puts("LIS3DH init failed");
+  if (microbit_serial.init() != 1) {
+    puts("MicroBitSerial init failed");
     return 3;
   }
 
@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
     }
 
 
-    lis3dh.accelRead(&xx, &yy, &zz);
+    microbit_serial.readAccelerometer(&xx, &yy, &zz);
     // Run one frame of the simulation. Use accelerometer
     // readings directly, no axis flips needed, global
     // cube vector data is all relative to accelerometer.
