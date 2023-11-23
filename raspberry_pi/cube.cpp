@@ -75,6 +75,16 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  //get serial port for Microbit, is set
+  std::vector<std::string> argList(argv + 1, argv + argc);
+  std::string microbit_arg = "--microbit-serial-port=";
+  std::string microbit_port = MicroBitSerial::SERIAL_PORT_DEFAULT_STRING;
+  for (auto const &str: argList) {
+    if (str.find(microbit_arg) != std::string::npos) {
+      microbit_port = str.substr(microbit_arg.length());
+    }
+  }
+
   // Parse command line input.  --led-help lists options!
   if (!(matrix = RGBMatrix::CreateFromOptions(matrix_options, runtime_opt))) {
     fprintf(stderr, "%s: couldn't create matrix object\n", argv[0]);
@@ -93,7 +103,7 @@ int main(int argc, char **argv) {
     return 2;
   }
 
-  if (microbit_serial.init() != 1) {
+  if (microbit_serial.init(microbit_port.c_str()) != 1) {
     puts("MicroBitSerial init failed");
     return 3;
   }
